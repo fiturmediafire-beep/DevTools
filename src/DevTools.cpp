@@ -376,30 +376,21 @@ void DevTools::show(bool visible) {
     auto& io = ImGui::GetIO();
     io.WantCaptureMouse = visible;
     io.WantCaptureKeyboard = visible;
-
-    if (!visible) {
-        ImGui::ClearActiveID();      
-        ImGui::FocusWindow(nullptr); 
-
-        // --- TAMBAHKAN KODE INI ---
-        // 1. Reset Framebuffer OpenGL ke layar utama (hilangkan kotak hitam)
-        #include <Geode/cocos/platform/CCGL.h>
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // 2. Reset ukuran Viewport Cocos2d-x ke ukuran layar penuh
-        auto director = cocos2d::CCDirector::sharedDirector();
-        auto glView = director->getOpenGLView();
-        if (glView) {
-            auto frameSize = glView->getFrameSize();
-            glView->setViewPortInPoints(0, 0, frameSize.width, frameSize.height);
-            glView->setScissorInPoints(0, 0, frameSize.width, frameSize.height);
-        }
-        // ---------------------------
-    }
 }
 
 void DevTools::toggle() {
     this->show(!m_visible);
+    
+    // Reset viewport HANYA saat DevTools ditutup
+    if (!m_visible) {
+        auto glView = cocos2d::CCDirector::sharedDirector()->getOpenGLView();
+        if (glView) {
+            auto frameSize = glView->getFrameSize();
+            // Kembalikan viewport ke ukuran layar penuh
+            glView->setViewPortInPoints(0, 0, frameSize.width, frameSize.height);
+            glView->setScissorInPoints(0, 0, frameSize.width, frameSize.height);
+        }
+    }
 }
 
 bool DevTools::isVisible() {
