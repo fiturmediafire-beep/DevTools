@@ -376,6 +376,11 @@ void DevTools::show(bool visible) {
     auto& io = ImGui::GetIO();
     io.WantCaptureMouse = visible;
     io.WantCaptureKeyboard = visible;
+
+    if (!visible) {
+        ImGui::ClearActiveID();      
+        ImGui::FocusWindow(nullptr); 
+    }
 }
 
 void DevTools::toggle() {
